@@ -1,0 +1,23 @@
+services:
+  zoo1:
+    image: zookeeper:3.4
+    restart: always
+    container_name: zoo1
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888
+
+  kafka1-test:
+    image: wurstmeister/kafka:2.13-2.7.1
+    restart: always
+    container_name: kafka1
+    privileged: true
+    depends_on:
+      - zoo1
+    ports:
+      - 19092:19092
+    environment:
+      KAFKA_LISTENERS: PLAINTEXT://kafka1:19092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:19092
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zoo1:2181

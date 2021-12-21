@@ -1,0 +1,10 @@
+services:
+  springboot:
+    image: openjdk:latest
+    restart: always
+    container_name: springboot
+    ports:
+      - 8080:8080
+    volumes:
+      - ./app/app.jar:/app/app.jar
+    command: java -jar /app/app.jar

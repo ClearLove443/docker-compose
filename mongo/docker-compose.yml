@@ -1,0 +1,9 @@
+services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    container_name: mongo
+    ports:
+      - 27017:27017
+    environment:
+      JAVA_OPTS=-Duser.timezone: Asia/Shanghai

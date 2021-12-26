@@ -1,0 +1,36 @@
+services:
+  cloudera:
+    image: cloudera/quickstart:latest
+    restart: always
+    container_name: cloudera
+    privileged: true
+    mem_limit: 8G
+    stdin_open: true
+    tty: true
+    ports:
+      - 80:80
+      - 8888:8888
+      - 50070:50070
+      - 1004:1004
+      - 1006:1006
+      - 7180:7180
+      - 8020:8020
+      - 8990:8990
+      - 21050:21050
+      - 88:88
+      - 88:88/udp
+      - 10000:10000
+      - 10002:10002
+      - 50111:50111
+      - 7337:7337
+      - 18088:18088
+      - 60010:60010
+      - 25010:25010
+      - 11000:11000
+      - 8088:8088
+      - 19888:19888
+    command: /bin/bash -c "/usr/bin/docker-quickstart"
+    volumes:
+      - ./src:/src
+      - ./CentOS-Base.repo:/etc/yum.repos.d/CentOS-Base.repo
+

@@ -8,3 +8,4 @@ services:
     volumes:
       - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./html:/etc/nginx/html
+      - ./ssl:/ssl/

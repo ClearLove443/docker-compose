@@ -1,5 +1,57 @@
+路由器 开启代理 加速
+
+
 ## Create container with docker
 
+### cloudera
+
+```bash
+cd /home/ubuntu/cloudera
+
+sudo docker run -d \
+    --name cloudera \
+    --hostname=quickstart.cloudera \
+    --privileged=true \
+    -t -i \
+    -v /home/ubuntu/cloudera/keytab/:/keytab \
+    -v /home/ubuntu/cloudera/CentOS-Base.repo:/etc/yum.repos.d/CentOS-Base.repo \
+    -m 12G \
+    -p 80:80 \
+    -p 88:88 \
+    -p 88:88/udp \
+    -p 1004:1004 \
+    -p 1006:1006 \
+    -p 3306:3306 \
+    -p 7180:7180 \
+    -p 7337:7337 \
+    -p 8020:8020 \
+    -p 8022:8022 \
+    -p 8030:8030 \
+    -p 8031:8031 \
+    -p 8032:8032 \
+    -p 8033:8033 \
+    -p 8088:8088 \
+    -p 8090:8090 \
+    -p 8888:8888 \
+    -p 8990:8990 \
+    -p 9083:9083 \
+    -p 60010:60010 \
+    -p 10000:10000 \
+    -p 10002:10002 \
+    -p 10020:10020 \
+    -p 10033:10033 \
+    -p 11000:11000 \
+    -p 18088:18088 \
+    -p 19888:19888 \
+    -p 19890:19890 \
+    -p 21050:21050 \
+    -p 25010:25010 \
+    -p 25020:25020 \
+    -p 50070:50070 \
+    -p 50111:50111 \
+    -p 50470:50470 \
+    cloudera/quickstart /usr/bin/docker-quickstart
+```
 ### portainer
 
 ```bash
@@ -7,6 +59,7 @@ sudo docker volume create portainer_data
 sudo docker run -d \
     --name portainer \
     -p 9000:9000 \
+    -p 9001:9001 \
     --restart=always \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v portainer_data:/data \
@@ -187,6 +240,26 @@ sqlpackage.exe /TargetFile:"D:\docker\SQL Server\sqldb-coredx-runtime-ac-dev001.
 sqlpackage.exe /SourceFile:"D:\Project\WorkSpace_aeon\sqldb-coredx-runtime-ac-dev001.bacpac" /Action:Import /TargetServerName:"127.0.0.1" /TargetUser:"sa" /TargetPassword:"!SqlServer2" /TargetDatabaseName:"mdmDB"
 ```
 
+### oracle
+
+```bash
+sudo docker run -d \
+    --name oracle \
+    -p 1521:1521 \
+    -e ORACLE_ENABLE_XDB=true \
+    -e ORACLE_ALLOW_REMOTE=true \
+    -v ./data:/oradata \
+    oracleinanutshell/oracle-xe-11g
+```
+
+- Initial username && password
+
+```
+sid: xe
+username: system
+password: oracle
+```
+
 ### gitlab
 
 ```bash
@@ -354,4 +427,23 @@ update REALM set ssl_required='NONE' where id = 'master';
 
 cp ~/keycloak.mv.db /opt/jboss/keycloak/standalone/data/keycloak.mv.db
 /opt/jboss/keycloak/bin/jboss-cli.sh --connect command=:reload
+```
+
+### sonarqube
+
+```bash
+sudo docker run -d \
+    --name sonarqube \
+    -p 9091:9000 \
+    -p 9092:9092 \
+    sonarqube:9.3-developer
+```
+
+```bash
+# conncet to admin console
+http://110.40.137.191:9091/
+
+Username: admin
+Password: admin
+New Password: admin
 ```

@@ -1,0 +1,9 @@
+services:
+  sonarqube:
+    # image: sonarqube:9.3-developer
+    image: sonarqube
+    restart: always
+    container_name: sonarqube
+    ports:
+      - 9091:9000
+      - 9092:9092

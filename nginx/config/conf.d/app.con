@@ -1,0 +1,47 @@
+    # 反向代理 front-end 和 back-end
+    server {
+        listen       80;
+        listen       [::]:80;
+        server_name  onlyyounotothers.top www.onlyyounotothers.top;
+        # http 重定向到 https
+        return 301 https://onlyyounotothers.top$request_uri;
+        location / {
+            root   html;
+            index  index.html index.htm;
+            proxy_pass http://localhost:8000/;
+        }
+        location /api/ {
+            rewrite ^/b/(.*)$ /$1 break; # 去除本地接口/api前缀, 否则会出现404
+            proxy_pass http://110.40.137.191:3000/;
+        }
+    }
+
+    # 开启ssl
+    # 反向代理 front-end 和 back-end
+    server {
+        #SSL 访问端口号为 443
+        listen 443 ssl;
+        #填写绑定证书的域名
+        server_name onlyyounotothers.top;
+        #证书文件名称
+        ssl_certificate /secrets/onlyyounotothers.top_bundle.crt;
+        #私钥文件名称
+        ssl_certificate_key /secrets/onlyyounotothers.top.key;
+        ssl_session_timeout 5m;
+        #请按照以下协议配置
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        #请按照以下套件配置，配置加密套件，写法遵循 openssl 标准。
+        ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+        ssl_prefer_server_ciphers on;
+        location / {
+           #网站主页路径。此路径仅供参考，具体请您按照实际目录操作。
+           #例如，您的网站运行目录在/etc/www下，则填写/etc/www。
+            root html;
+            index  index.html index.htm;
+            proxy_pass http://localhost:8000/;
+        }
+        location /api/ {
+            rewrite ^/b/(.*)$ /$1 break; # 去除本地接口/api前缀, 否则会出现404
+            proxy_pass http://110.40.137.191:3000/;
+        }
+    }

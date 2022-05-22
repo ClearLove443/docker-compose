@@ -1,19 +1,22 @@
 services:
   zoo1:
     image: zookeeper:3.4
-    restart: always
+    restart: "no"
     container_name: zoo1
+    ports:
+      - 2181:2181
+    volumes:
+      - "./zkcluster/zoo1/data:/data"
+      - "./zkcluster/zoo1/datalog:/datalog"
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=0.0.0.0:2888:3888
 
-  kafka1-test:
-    image: wurstmeister/kafka:2.13-2.7.1
-    restart: always
+  kafka1:
+    image: wurstmeister/kafka:2.13-2.8.1
+    restart: "no"
     container_name: kafka1
     privileged: true
-    depends_on:
-      - zoo1
     ports:
       - 19092:19092
     environment:
@@ -21,3 +24,17 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:19092
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zoo1:2181
+    volumes:
+      - ./kafkaCluster/kafka1/logs:/kafka
+    depends_on:
+      - zoo1
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    restart: always
+    container_name: kafka-ui
+    ports:
+      - 28080:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: wsl2-docker
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:19092

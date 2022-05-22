@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  kms:
+    image: registry.onlyyounotothers.top:11080/py-kms:python3
+    container_name: py-kms
+    ports:
+      - 1688:1688
+      - 18080:8080
+    environment:
+      - IP=0.0.0.0
+      - SQLITE=true
+      - HWID=RANDOM
+      - LOGLEVEL=INFO
+    restart: always
+    volumes:
+      - ./db:/home/py-kms/db
+      - /etc/localtime:/etc/localtime:ro

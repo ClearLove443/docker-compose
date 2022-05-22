@@ -1,0 +1,16 @@
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    restart: always
+    container_name: jenkins
+    user: root
+    ports:
+      - 8080:8080
+      - 50000:50000
+    environment:
+      JAVA_OPTS: "-Duser.timezone=Asia/Shanghai -Djava.awt.headless=true -Dhudson.model.DownloadService.noSignatureCheck=true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - ./data:/var/jenkins_home
+      - /etc/localtime:/etc/localtime

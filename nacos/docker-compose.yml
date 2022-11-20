@@ -1,9 +1,0 @@
-services:
-  nacos:
-    image: nacos/nacos-server:latest
-    restart: always
-    container_name: nacos
-    ports:
-      - 8848:8848
-    environment:
-      MODE: standalone

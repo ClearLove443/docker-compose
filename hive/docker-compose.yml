@@ -1,9 +1,10 @@
 version: '3'
-services:
 
+services:
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop2.7.4-java8
     container_name: namenode
+    hostname: namenode
     volumes:
       - ./hdfs/namenode:/hadoop/dfs/name
     environment:
@@ -12,10 +13,12 @@ services:
       - ./hadoop-hive.env
     ports:
       - "50070:50070"
+      - "8020:8020"
 
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
     container_name: datanode
+    hostname: datanode
     volumes:
       - ./hdfs/datanode:/hadoop/dfs/data
     env_file:
@@ -26,6 +29,7 @@ services:
       - namenode
     ports:
       - "50075:50075"
+      - "50010:50010"
 
   hive-server:
     image: bde2020/hive:2.3.2-postgresql-metastore

@@ -1,7 +1,7 @@
 services:
-  my_kdc:
+  kdc:
     build: .
-    container_name: my_kdc
+    container_name: kdc
     stdin_open: true
     tty: true
     privileged : true

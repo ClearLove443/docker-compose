@@ -55,6 +55,10 @@ sudo /home/cloudera/cloudera-manager --express --force
 <!-- sudo service cloudera-scm-server restart -->
 
 quickstart.cloudera:7180
+127.0.0.1:7180
+
+username: cloudera
+password: cloudera
 
 ## kerberos
 
@@ -65,7 +69,7 @@ cd /etc/yum.repos.d/
 mkdir backup
 mv cloudera* backup
 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
-curl -o /etc/yum.repos.d/CentOS-Base.repo https://www.xmpan.com/Centos-6-Vault-Aliyun.repo
+curl -k -o /etc/yum.repos.d/CentOS-Base.repo https://www.xmpan.com/Centos-6-Vault-Aliyun.repo
 
 yum update
 

@@ -1,16 +1,18 @@
 services:
   zoo1:
-    image: confluentinc/cp-zookeeper:7.0.0
-    restart: always
+    image: confluentinc/cp-zookeeper:7.2.2
+    restart: "no"
     container_name: zoo1
+    ports:
+      - 2181:2181
     environment:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=0.0.0.0:2888:3888
       ZOOKEEPER_CLIENT_PORT: 2181
 
-  kafka1-test:
-    image: confluentinc/cp-kafka:7.0.0
-    restart: always
+  kafka1:
+    image: confluentinc/cp-kafka:7.2.2
+    restart: "no"
     container_name: kafka1
     privileged: true
     depends_on:
@@ -18,10 +20,71 @@ services:
     ports:
       - 19092:19092
     environment:
-      KAFKA_LISTENERS: PLAINTEXT://kafka1:19092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:19092
       KAFKA_ZOOKEEPER_CONNECT: zoo1:2181
+      # KAFKA_LISTENERS: PLAINTEXT://kafka1:19092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:19092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.2.2
+    restart: "no"
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - kafka1
+    ports:
+      - 18081:1081
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:19092
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:18081
+
+  connect:
+    image: cnfldemos/cp-server-connect-datagen:0.6.0-7.2.1
+    restart: "no"
+    hostname: connect
+    container_name: connect
+    depends_on:
+      - kafka1
+      - schema-registry
+    ports:
+      - 18083:8083
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka1:19092
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:18081
+      # CLASSPATH required due to CC-2422
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.2.1.jar
+      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor
+      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor
+      CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components
+      CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+
+  rest-proxy:
+    image: confluentinc/cp-kafka-rest:7.2.2
+    restart: "no"
+    depends_on:
+      - kafka1
+      - schema-registry
+    ports:
+      - 18082:18082
+    hostname: rest-proxy
+    container_name: rest-proxy
+    environment:
+      KAFKA_REST_HOST_NAME: rest-proxy
+      KAFKA_REST_BOOTSTRAP_SERVERS: kafka1:19092
+      KAFKA_REST_LISTENERS: http://0.0.0.0:18082
+      KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema-registry:18081

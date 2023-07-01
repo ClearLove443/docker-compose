@@ -1,0 +1,10 @@
+services:
+  desktop-vnc:
+    image: dorowu/ubuntu-desktop-lxde-vnc
+    container_name: desktop-vnc
+    environment:
+      RESOLUTION: 2000x980
+    ports:
+      - 8080:80
+    volumes:
+      - ./share:/root/desktop/share
